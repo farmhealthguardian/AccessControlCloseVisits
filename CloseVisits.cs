@@ -22,6 +22,7 @@ namespace FHG.AccessControl
             {
                 _logger.LogInformation($"Next timer schedule at: {myTimer.ScheduleStatus.Next}");
             }
+            //sample change
         }
     }
 }
