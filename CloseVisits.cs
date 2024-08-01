@@ -18,17 +18,24 @@ namespace FHG.AccessControl
         }
 
         [Function("CloseVisits")]
-        public void Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer)
+        public void Run([TimerTrigger("0 0 4 * * *")] TimerInfo myTimer) // runs at 4 am every day
         {
             _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
-            var accessControls = _context.Visit.Where(c=>c.OriginId == 33).ToList();
-            
-            if (myTimer.ScheduleStatus is not null)
-            {
-                _logger.LogInformation($"Next timer schedule at: {myTimer.ScheduleStatus.Next}");
+            var originIds = new[]{33,34};
+            var visits = _context.Visit.Where(c=> originIds.Contains(c.OriginId) && c.ExitDate == null).ToList(); 
+
+            if(visits.Count > 0){
+                foreach (var visit in visits)
+                {
+                   if((DateTime.UtcNow - visit.Date).Hours <= 10){
+                    visit.DurationMinutes = (DateTime.Now - visit.Date).Minutes;
+                    _context.Update(visit);
+                    _context.SaveChanges();
+                   }
+                }
             }
-            //sample change
+            
         }
     }
     public class Visit{
@@ -42,7 +49,7 @@ namespace FHG.AccessControl
     }
 
 
-     public partial class ApplicationDbContext : DbContext
+    public partial class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(){}
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -56,7 +63,8 @@ namespace FHG.AccessControl
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
             //TODO set certain strings as allowing null on creating
-
+                modelBuilder.Entity<Visit>()
+                .Property(b => b.ExitDate).HasComputedColumnSql("DATEADD(MINUTE, DurationMinutes, Date) PERSISTED");
             OnModelCreatingPartial(modelBuilder);
         }
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
