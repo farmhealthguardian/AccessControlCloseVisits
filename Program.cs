@@ -9,9 +9,9 @@ var host = new HostBuilder()
     .ConfigureServices(services => {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
-         services.AddDbContext<ApplicationDbContext>(options => 
-             options.UseSqlServer(Environment.GetEnvironmentVariable("ConnectionStrings:DefaultConnection"))
-             .EnableDetailedErrors(true));
+        services.AddDbContext<ApplicationDbContext>(options => 
+            options.UseSqlServer(Environment.GetEnvironmentVariable("ConnectionStrings:DefaultConnection"))
+            .EnableDetailedErrors(true));
     })
     .Build();
 host.Run();

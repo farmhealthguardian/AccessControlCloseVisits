@@ -18,7 +18,7 @@ namespace FHG.AccessControl
         }
 
         [Function("CloseVisits")]
-        public void Run([TimerTrigger("0 0 4 * * *")] TimerInfo myTimer) // runs at 4 am every day
+        public void Run([TimerTrigger("0 0 4 * * *")] TimerInfo myTimer) // runs at 4 am every day  "0 0 4 * * *"
         {
             _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
@@ -55,6 +55,7 @@ namespace FHG.AccessControl
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+
         }
 
         public DbSet<Visit> Visit { get; set; }
